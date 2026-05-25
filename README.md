@@ -9,7 +9,7 @@
 [![License](https://img.shields.io/badge/License-MIT-8A2BE2)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-FF6B6B)](CONTRIBUTING.md)
 [![Windows](https://img.shields.io/badge/Windows-x64-00A4EF?logo=windows&logoColor=fff)](https://github.com/your-username/contextbridge/releases)
-[![Linux](https://img.shields.io/badge/Linux-x64-E95420?logo=linux&logoColor=fff)](https://github.com/your-username/contextbridge/releases)
+[![Linux](https://img.shields.io/badge/Linux-x64-E95420?logo=linux&logoColor=fff)](https://github.com/lhawzed-alt/ContextBridge/releases)
 
 ---
 
@@ -50,8 +50,8 @@ Copy-paste loses context. Uploading to some cloud AI tool leaks your IP. Writing
 ### 🧪 One-liner (source)
 
 ```bash
-git clone https://github.com/your-username/contextbridge.git
-cd contextbridge
+git clone https://github.com/lhawzed-alt/ContextBridge.git
+cd ContextBridge
 bun install
 bun run prebuild
 bun start
@@ -231,7 +231,7 @@ bun run package:win   # or package:linux
 ---
 
 <p align="center">
-  <strong>ContextBridge</strong> · Made for the Vibe Coding era · <a href="https://github.com/your-username/contextbridge">★ Star on GitHub</a>
+  <strong>ContextBridge</strong> · Made for the Vibe Coding era · <a href="https://github.com/lhawzed-alt/ContextBridge">★ Star on GitHub</a>
   <br>
-  <sub>Found a bug? <a href="https://github.com/your-username/contextbridge/issues">Open an issue</a> · Want to contribute? PRs welcome!</sub>
+  <sub>Found a bug? <a href="https://github.com/lhawzed-alt/ContextBridge/issues">Open an issue</a> · Want to contribute? PRs welcome!</sub>
 </p>
