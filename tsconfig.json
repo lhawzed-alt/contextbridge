@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "module": "nodenext",
+    "target": "es2022",
+    "moduleResolution": "nodenext",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "types": ["node"],
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "src/**/*"
+  ],
+}

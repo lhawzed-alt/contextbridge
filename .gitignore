@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Auto-generated code
+src/ui/_html.ts
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+contextbridge.log
+
+# Vitest cache
+.vitest/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE / Editor
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Coverage reports
+coverage/
+
+# Temporary files
+tmp/
+temp/

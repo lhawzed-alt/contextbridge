@@ -1,0 +1,31 @@
+{
+  "name": "contextbridge",
+  "version": "1.0.0",
+  "description": "Bridge your local files, network paths & MCP configs into any AI agent — no uploads, no cloud.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "prebuild": "node scripts/inline-html.mjs",
+    "build": "tsc",
+    "start": "npm run ui",
+    "test": "npm run prebuild && vitest run",
+    "test:watch": "npm run prebuild && vitest",
+    "ui": "npm run prebuild && npx tsx src/ui/cli.ts",
+    "package:win": "npm run prebuild && bun build --compile --target=bun-windows-x64 ./src/ui/cli.ts --outfile=dist/contextbridge",
+    "package:linux": "npm run prebuild && bun build --compile --target=bun-linux-x64 ./src/ui/cli.ts --outfile=dist/contextbridge"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.7"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  }
+}

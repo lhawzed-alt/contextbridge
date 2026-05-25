@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ContextBridge</title>
+<style>
+  :root {
+    --teal-50: #e0f5f5;
+    --teal-200: #81d4d0;
+    --teal-500: #0a9396;
+    --teal-600: #007f7f;
+    --teal-800: #005f73;
+    --green-200: #94d2bd;
+    --slate-100: #eef2f5;
+    --slate-200: #dce2e8;
+    --slate-400: #8a9ba8;
+    --slate-600: #4a5a68;
+    --slate-800: #1e2a33;
+    --slate-900: #0f1a24;
+    --red: #d44c4c;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    background: var(--slate-100);
+    color: var(--slate-800);
+    min-height: 100vh;
+  }
+  header {
+    background: linear-gradient(135deg, var(--teal-800), var(--teal-500));
+    color: #fff;
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  header h1 { font-size: 1.4rem; font-weight: 600; letter-spacing: 0.02em; }
+  header span { opacity: 0.75; font-size: 0.85rem; }
+  .container { max-width: 720px; margin: 2rem auto; padding: 0 1rem; display: flex; flex-direction: column; gap: 1.5rem; }
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .card-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--teal-500);
+    margin-bottom: 0.75rem;
+  }
+  .empty {
+    color: var(--slate-400);
+    font-size: 0.9rem;
+    padding: 0.5rem 0;
+  }
+  .server-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--slate-100);
+    font-size: 0.9rem;
+  }
+  .server-row:last-child { border: none; }
+  .server-row .name { font-weight: 500; color: var(--slate-800); }
+  .server-row .cmd { color: var(--slate-400); font-family: "SF Mono", "Fira Code", monospace; font-size: 0.8rem; }
+  .server-row .del {
+    background: none;
+    border: 1px solid var(--red);
+    color: var(--red);
+    border-radius: 6px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .server-row .del:hover { background: var(--red); color: #fff; }
+  form { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  form input {
+    flex: 1 1 120px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--slate-200);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border 0.15s;
+  }
+  form input:focus { border-color: var(--teal-500); }
+  .btn {
+    background: var(--teal-500);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .btn:hover { background: var(--teal-600); }
+  .btn-outline {
+    background: none;
+    border: 1px solid var(--teal-500);
+    color: var(--teal-500);
+  }
+  .btn-outline:hover { background: var(--teal-50); }
+  .row { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+  .row input { flex: 1; }
+  .scan-result {
+    margin-top: 0.75rem;
+    max-height: 200px;
+    overflow-y: auto;
+    font-size: 0.82rem;
+  }
+  .scan-result .entry {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid var(--slate-100);
+    font-family: "SF Mono", "Fira Code", monospace;
+  }
+  .scan-result .entry:last-child { border: none; }
+  .scan-result .dir { color: var(--teal-500); }
+  .scan-result .file { color: var(--slate-600); }
+  .toast {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    background: var(--slate-900);
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    opacity: 0;
+    transition: opacity 0.25s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+  .sync-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .sync-row .path-hint {
+    font-size: 0.78rem;
+    color: var(--slate-400);
+    word-break: break-all;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ContextBridge</h1>
+  <span>MCP 配置面板</span>
+  <span style="flex:1"></span>
+  <a href="https://github.com/your-username/contextbridge/issues" target="_blank" style="color:#fff;text-decoration:none;font-size:0.82rem;display:flex;align-items:center;gap:4px;opacity:0.85;transition:opacity 0.15s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.85">💬 Feedback</a>
+  <span id="version-badge" style="font-size:0.75rem;opacity:0.6;margin-left:0.5rem;">v1.0.0</span>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <div class="card-title">MCP 服务器</div>
+    <div id="server-list"><div class="empty">加载中...</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">添加服务器</div>
+    <form id="add-form">
+      <input name="name" placeholder="名称" required>
+      <input name="command" placeholder="命令 (如 npx)" required>
+      <input name="args" placeholder="参数 (逗号分隔)">
+      <button class="btn" type="submit">添加</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-title">扫描目录</div>
+    <div class="row">
+      <input id="scan-path" placeholder="输入本地路径 如 C:\Projects 或 /home/user">
+      <button class="btn btn-outline" id="scan-btn">扫描</button>
+    </div>
+    <div id="scan-result" class="scan-result"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">同步到全局配置</div>
+    <div class="sync-row">
+      <span class="path-hint" id="sync-path"></span>
+      <button class="btn" id="sync-btn">一键同步</button>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const API = '';
+
+async function api(method, path, body) {
+  const opts = { method, headers: {} };
+  if (body) {
+    opts.headers['Content-Type'] = 'application/json';
+    opts.body = JSON.stringify(body);
+  }
+  const res = await fetch(API + path, opts);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(err.error || res.statusText);
+  }
+  return res.json();
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+async function loadServers() {
+  const list = document.getElementById('server-list');
+  try {
+    const servers = await api('GET', '/api/servers');
+    if (!servers.length) {
+      list.innerHTML = '<div class="empty">暂无服务器配置</div>';
+      return;
+    }
+    list.innerHTML = servers.map(s => {
+      const cmd = [s.command, ...s.args].join(' ');
+      return `<div class="server-row">
+        <div>
+          <div class="name">${esc(s.name)}</div>
+          <div class="cmd">${esc(cmd)}</div>
+        </div>
+        <button class="del" data-name="${esc(s.name)}">删除</button>
+      </div>`;
+    }).join('');
+    list.querySelectorAll('.del').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        await api('DELETE', '/api/servers/' + encodeURIComponent(btn.dataset.name));
+        toast('已删除');
+        loadServers();
+      });
+    });
+  } catch (e) {
+    list.innerHTML = '<div class="empty">加载失败: ' + esc(e.message) + '</div>';
+  }
+}
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+document.getElementById('add-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const name = fd.get('name').trim();
+  const command = fd.get('command').trim();
+  const args = fd.get('args').trim().split(',').map(s => s.trim()).filter(Boolean);
+  if (!name || !command) return;
+  try {
+    await api('POST', '/api/servers', { name, command, args });
+    toast('已添加');
+    e.target.reset();
+    loadServers();
+  } catch (err) {
+    toast('添加失败: ' + err.message);
+  }
+});
+
+document.getElementById('scan-btn').addEventListener('click', async () => {
+  const path = document.getElementById('scan-path').value.trim();
+  if (!path) return;
+  const result = document.getElementById('scan-result');
+  result.innerHTML = '<div class="empty">扫描中...</div>';
+  try {
+    const files = await api('POST', '/api/scan', { path });
+    if (!files.length) {
+      result.innerHTML = '<div class="empty">目录为空</div>';
+      return;
+    }
+    result.innerHTML = files.map(f =>
+      `<div class="entry">
+        <span class="${f.isDirectory ? 'dir' : 'file'}">${esc(f.name)}</span>
+        <span>${f.isDirectory ? '📁' : (f.size < 1024 ? f.size + ' B' : (f.size / 1024).toFixed(1) + ' KB')}</span>
+      </div>`
+    ).join('');
+  } catch (err) {
+    result.innerHTML = '<div class="empty">扫描失败: ' + esc(err.message) + '</div>';
+  }
+});
+
+document.getElementById('sync-btn').addEventListener('click', async () => {
+  try {
+    const res = await api('POST', '/api/sync');
+    document.getElementById('sync-path').textContent = res.path;
+    toast('已同步到 ' + res.path);
+  } catch (err) {
+    toast('同步失败: ' + err.message);
+  }
+});
+
+loadServers();
+
+(async function checkVersion() {
+  try {
+    const data = await api('GET', '/api/version-check');
+    const badge = document.getElementById('version-badge');
+    badge.textContent = 'v' + data.current;
+    if (data.update) {
+      badge.style.opacity = '1';
+      badge.style.color = '#94d2bd';
+      badge.innerHTML = '🎉 v' + data.current + ' → <a href="' + data.update.url + '" target="_blank" style="color:#94d2bd;text-decoration:underline;">v' + data.update.latest + '</a>';
+    }
+  } catch {}
+})();
+</script>
+</body>
+</html>
